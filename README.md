@@ -76,6 +76,16 @@ const addItem = async (product) => {
 };
 ```
 
+### Inventory Tracking
+
+Add stock awareness so the cart never exceeds available units:
+
+1. **Extend the data model**: add `inventory` (and optional `maxPerOrder`) to `Product` in `types.ts` and `data.ts`.
+2. **Guard mutations**: inside `useCart`, check current quantity before `ADD_ITEM`/`UPDATE_QUANTITY`. Clamp to available stock or return `{ success: false, error: 'Out of stock' }` so the UI can surface messaging.
+3. **Optional reservations**: keep a `Map<ProductId, number>` in state when multiple tabs/users might race for the same inventory. Note this can also be guarded by having a SOLD OUT THRESHOLD that is NOT 0 and managing cart qty as a buffered "removed inv qty"
+4. **UI feedback**: disable “Add to Cart” when `inventory <= SOLD_OUT_THRESHOLD`, show “Only N left” for low stock, and surface errors when a user exceeds the maximum.
+5. **Testing**: unit-test the guard logic and component-test the disabled button/error states.
+
 ---
 
 ## Testing Philosophy
